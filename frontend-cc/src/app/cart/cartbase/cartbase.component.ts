@@ -43,6 +43,13 @@ export class CartbaseComponent {
           this.cartitems = response.items;
           this.total_price = response.total_price
           this.loading = false;
+
+          // quantity calculations
+          let totalItems = 0;
+          for(let cartItem of this.cartitems) {
+            totalItems += cartItem?.quantity;
+          }
+          this.cartservice.setCartItemValue(totalItems);
         },
         error: (err: any) => {
           this.loading = false;

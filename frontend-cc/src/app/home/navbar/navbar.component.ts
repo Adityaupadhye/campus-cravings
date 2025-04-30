@@ -1,10 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { Dialog } from 'primeng/dialog';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { FormsModule } from '@angular/forms';
 import { LoginComponent } from '../../auth/login/login.component';
 import { CartService } from '../../services/cart/cart.service';
 import { AuthService } from '../../services/auth/auth.service';
@@ -19,13 +15,20 @@ import { ToastModule } from 'primeng/toast';
   providers: [MessageService]
 })
 export class NavbarComponent implements OnInit {
+
+  
   constructor(
     private router: Router,
     private cartservice: CartService,
     private authservice: AuthService,
     private messageservice: MessageService,
+    
+  ) {
+    this.cartItemsCounter$ = this.cartservice.cartItemCount$;
+  }
+  
+  cartItemsCounter$;
 
-  ) { }
   isLoggedIn: boolean = false;;
   cartItems = 0;
   isMenuOpen = false;
@@ -98,6 +101,7 @@ export class NavbarComponent implements OnInit {
       }
     });
   }
+  
   navigateOrder() {
     console.log(this.authservice.getUserStatus())
     if (this.authservice.getUserStatus() == true) {
