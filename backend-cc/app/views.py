@@ -573,7 +573,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
     
     @action(detail= False, methods=['post'],permission_classes=[IsAuthenticated],authentication_classes=[CookieJWTAuthentication])
     def createorder(self,request):
-        user = request.user
+        current_user = request.user
 
         try:
             total_price = int(request.data.get('total', 0))
@@ -589,25 +589,43 @@ class PaymentViewSet(viewsets.ModelViewSet):
             with transaction.atomic():
                 # creating order 
                 order = ActiveOrder.objects.create(
-                    ordered_by=user,
+                    ordered_by=current_user,
                     status='Pending',
                     total_price=total_price,
                 )
+                print('order created: ', order)
 
-                orderItems = [
-                    OrderItem(
+                # get items from user's cart
+                cart_items = CartItem.objects.filter(user=current_user)
+                print('cart items: ', cart_items)
+
+                # create order items
+                order_items = []
+                for cart_item in cart_items:
+                    order_item = OrderItem(
                         order=order,
-                        menu_item=MenuItem.objects.get(id=item['menu_item']['id']), 
-                        quantity = item['quantity']
+                        menu_item=MenuItem.objects.get(id=cart_item.menu_item.id), 
+                        quantity = cart_item.quantity
                     )
-                    for item in request.data['items'] 
-                ]
+                    order_items.append(order_item)
 
-                OrderItem.objects.bulk_create(orderItems)
+
+                # orderItems = [
+                #     OrderItem(
+                #         order=order,
+                #         menu_item=MenuItem.objects.get(id=item['menu_item']['id']), 
+                #         quantity = item['quantity']
+                #     )
+                #     for item in request.data['items'] 
+                # ]
+
+                order_items_created = OrderItem.objects.bulk_create(order_items)
+
+                print('order items: ', order_items_created)
 
                 customerDetails = CustomerDetails(
-                    customer_id= user.name,
-                    customer_phone= User.objects.get(id=user.id).phone_number
+                    customer_id= current_user.name,
+                    customer_phone= User.objects.get(id=current_user.id).phone_number
                 )
             
                 orderMeta = OrderMeta(
@@ -639,11 +657,11 @@ class PaymentViewSet(viewsets.ModelViewSet):
                         'payment_session_id': api_response.data.payment_session_id,
                         'order_id': order.id,  
                     }
-                })
+                }, status=status.HTTP_200_OK)
 
 
         except Exception as e:
-            print(f"Order creation failed for user {user.id}: {str(e)}")   
+            print(f"Order creation failed for user {current_user.id}: {str(e)}")   
             if 'order' in locals():
                 order.status = 'Rejected'
                 order.save()
@@ -705,7 +723,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
             
             # get all payload data
             payload = webhook_req_data
-            order_id = payload['data']['order']['order_id']
+            order_id: str = payload['data']['order']['order_id']
             payment_status = payload['data']['payment']['payment_status']
             cf_payment_id = payload['data']['payment']['cf_payment_id']
             payment_amount = payload['data']['payment']['payment_amount']
@@ -713,7 +731,11 @@ class PaymentViewSet(viewsets.ModelViewSet):
 
             # fetch order from order_id
             # do any processing if required on order_id
-            order = ActiveOrder.objects.get(pk=int(order_id))
+
+            # current order_id format id ORD###
+            # we just want ### and int format
+            order_id_db = int(order_id[3:])
+            order = ActiveOrder.objects.get(pk=int(order_id_db))
 
             # set internal payment status
             payment_status_internal = ''

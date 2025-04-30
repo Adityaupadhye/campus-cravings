@@ -12,10 +12,14 @@ export class PaymentService {
   constructor(private http: HttpClient) { }
 
   initiatePayment(amount: number, orderId?: string): Observable<any> {
-    const payload: any = { amount };
+    const payload: any = {
+      'total': amount
+    };
+
     if (orderId) {
       payload.order_id = orderId;
     }
-    return this.http.post(`${this.apiUrl}/payments/initiate/`, payload,{withCredentials:true});
+
+    return this.http.post(`${this.apiUrl}/payments/createorder/`, payload, { withCredentials: true });
   }
 }

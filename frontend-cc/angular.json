@@ -31,7 +31,9 @@
               "src/styles.css",
               "node_modules/ngx-spinner/animations/square-jelly-box.css"
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/@cashfreepayments/cashfree-js/dist/script.esm.js"
+            ]
           },
           "configurations": {
             "production": {
