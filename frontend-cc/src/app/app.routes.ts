@@ -29,77 +29,77 @@ export const routes: Routes = [
     },
     {
         path: 'login',
-        component: LoginComponent   
+        component: LoginComponent
     },
     {
         path: 'login/otp',
-        component : OtpComponent
+        component: OtpComponent
     },
 
     {
         path: 'cart',
-        component : CartbaseComponent
+        component: CartbaseComponent
     },
     {
         path: 'account',
-        component : DetailsComponent
+        component: DetailsComponent
     },
     {
         path: 'menu',
-        component : HomeComponent
+        component: HomeComponent
     },
     {
         path: 'orders',
-        component : AllorderComponent
+        component: AllorderComponent
     },
     {
         path: 'account/editdetails',
-        component : EditdetailsComponent
+        component: EditdetailsComponent
     },
     {
         path: 'orders/orderdetails',
-        component : OrderviewComponent
+        component: OrderviewComponent
     },
     {
-        path:'admin',
+        path: 'admin',
         component: AdminlayoutComponent,
-        children:[
+        children: [
             {
-                path:'managecategory',
-                component:ManagecategoryComponent
+                path: 'managecategory',
+                component: ManagecategoryComponent
             },
             {
-                path:'managemenu',
-                component:ManagemenuComponent
+                path: 'managemenu',
+                component: ManagemenuComponent
             },
             {
-                path:'allorders',
-                component:ManageordersComponent
+                path: 'allorders',
+                component: ManageordersComponent
             },
             {
-                path:'allorders/orderdetails',
-                component:AdminOrderviewComponent
+                path: 'allorders/orderdetails',
+                component: AdminOrderviewComponent
             },
 
         ]
     },
     {
-        path:'payment',
-        component:PaymentHomeComponent
+        path: 'payment',
+        component: PaymentHomeComponent
     },
     {
-        path:'orderconfirmed',
-        component:ConfirmedComponent,
+        path: 'orderconfirmed',
+        component: ConfirmedComponent,
 
     },
     {
-        path : 'processingpayment',
-        component:PaymentloadingComponent
+        path: 'payment/progress',
+        component: PaymentloadingComponent
     },
     {
-        path:'**',
-        redirectTo:''
+        path: '**',
+        redirectTo: ''
     },
-    
+
 
 ];

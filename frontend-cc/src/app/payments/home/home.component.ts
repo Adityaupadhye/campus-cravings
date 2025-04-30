@@ -59,6 +59,11 @@ export class PaymentHomeComponent implements OnInit {
           };
           this.cashfree.checkout(checkoutOptions);
 
+          // route to payment/progress?status=pending
+          this.router.navigate(['payment/progress'], {
+            queryParams: { status: 'pending' }
+          });
+
 
         } else {
           this.error = 'Failed to initiate payment';

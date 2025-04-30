@@ -71,6 +71,7 @@ export class NavbarComponent implements OnInit {
         next: (response: any) => {
           console.log(response)
           this.cartItems = response.count || 0;
+          this.cartservice.setCartItemValue(this.cartItems);
         },
         error: (err: any) => {
         }
