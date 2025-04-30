@@ -25,13 +25,13 @@ import { SkeletonModule } from 'primeng/skeleton';
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
-  providers :[MessageService],
+  providers: [MessageService],
 })
 export class HomeComponent implements OnInit, OnChanges {
-  
+
   @Input() menuItems: any[] = [];
-    
-  isLoading= true;
+
+  isLoading = true;
   category: string | null = null;
   selectedCategory: string = 'all';
   itemQuantities: { [itemId: number]: number } = {};
@@ -44,7 +44,7 @@ export class HomeComponent implements OnInit, OnChanges {
     private cartservice: CartService,
     private router: ActivatedRoute,
     private redirectrouter: Router,
-    private messageService : MessageService
+    private messageService: MessageService
   ) { }
 
   ngOnInit(): void {
@@ -57,14 +57,28 @@ export class HomeComponent implements OnInit, OnChanges {
 
     this.getmenu();
     this.getcategories();
-    
-      
+
+
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['menuItems']) {
       console.log('Menu items changed:', this.menuItems);
     }
+  }
+
+  itemcount() {
+    this.cartservice.itemcount()
+      .subscribe({
+        next: (response: any) => {
+          console.log(response);
+          this.cartservice.setCartItemValue(response?.count)
+        },
+        error: (err: any) => {
+
+        }
+      })
+
   }
 
   getcategories(): void {
@@ -86,11 +100,11 @@ export class HomeComponent implements OnInit, OnChanges {
           this.menuItems.forEach(item => {
             this.itemQuantities[item.id] = 1;
           });
-          this.isLoading=false;
+          this.isLoading = false;
         },
         error: (err: any) => {
           console.error('Error fetching menu:', err);
-          this.isLoading= false;
+          this.isLoading = false;
         }
       });
   }
@@ -99,32 +113,34 @@ export class HomeComponent implements OnInit, OnChanges {
     this.selectedCategory = category || 'all';
   }
 
-  addtoCart(item_id: number, quantity: number,name :string): void {
+  addtoCart(item_id: number, quantity: number, name: string): void {
     this.cartservice.addtocart({ 'id': item_id, 'quantity': quantity })
       .subscribe({
         next: (response: any) => {
           console.log('Added to cart:', response);
-          this.showPopUp(name,quantity);
-        
+          this.showPopUp(name, quantity);
+          this.itemcount();
+
         },
         error: (err: any) => {
-          this.showErrorPopUp();          
+          this.showErrorPopUp();
         }
       });
   }
 
-  showPopUp(name:string, quantity:number) {
-    this.messageService.add({ severity: 'success', summary: 'Yay! It\'s in your cart 🛒', detail: quantity+' X '+name+'\nAdded to your cart', key:'br', life: 2000 });
+  showPopUp(name: string, quantity: number) {
+    this.messageService.add({ severity: 'success', summary: 'Yay! It\'s in your cart 🛒', detail: quantity + ' X ' + name + '\nAdded to your cart', key: 'br', life: 2000 });
   }
-  
-  showErrorPopUp(){
-    this.messageService.add({severity: 'error', summary: 'Oops !', detail:'Failed to add item to cart !', key:'br', life: 2000 })
+
+  showErrorPopUp() {
+    this.messageService.add({ severity: 'error', summary: 'Oops !', detail: 'Failed to add item to cart !', key: 'br', life: 2000 })
   }
-  goToCheckout(){
+
+  goToCheckout() {
     this.redirectrouter.navigate(['/cart/'])
   }
 
 
 
-  
+
 }
