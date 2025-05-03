@@ -55,7 +55,7 @@ export class PaymentHomeComponent implements OnInit {
           // get payment_session_id and pass it to cashfree sdk
           let checkoutOptions = {
             paymentSessionId: response['data']['payment_session_id'],
-            redirectTarget: "_blank",
+            redirectTarget: "_self",
           };
           this.cashfree.checkout(checkoutOptions);
 

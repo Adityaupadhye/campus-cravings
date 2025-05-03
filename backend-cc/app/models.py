@@ -141,7 +141,7 @@ class Payment(models.Model):
     order = models.ForeignKey(ActiveOrder,on_delete=models.CASCADE,related_name='payment')
     status = models.CharField(max_length=10, choices=PAYMENT_STATUS_CHOICES, default='Pending')
     payment_time = models.DateTimeField(auto_now_add=True)
-    transaction_id = models.CharField(max_length=50,unique=True,blank=True, null=True)
+    transaction_id = models.CharField(max_length=50,unique=True,blank=True, null=True)  
 
     # Timestamp fields
     created_at = models.DateTimeField(auto_now_add=True)  # Set once when record is created

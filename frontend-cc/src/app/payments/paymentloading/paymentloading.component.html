@@ -1,5 +1,5 @@
 <!-- waiting-for-payment.component.html -->
-<div *ngIf="status == 'pending'" class="flex flex-col items-center justify-center min-h-screen bg-white p-1">
+<div *ngIf="paymentStatus == 'Pending'" class="flex flex-col items-center justify-center min-h-screen bg-white p-1">
   <ng-lottie 
     [options]="loadingOptions"
     width="100%"
@@ -10,7 +10,7 @@
 </div>
 
 <!-- payment-success.component.html -->
-<div *ngIf="status == 'success'" class="flex flex-col items-center justify-center min-h-screen bg-white p-4">
+<div *ngIf="paymentStatus == 'Completed'" class="flex flex-col items-center justify-center min-h-screen bg-white p-4">
   <ng-lottie 
     width="100%"
     height="200px"
@@ -22,7 +22,7 @@
 </div>
 
 <!-- payment-failed.component.html -->
-<div *ngIf="status == 'fail'" class="flex flex-col items-center justify-center min-h-screen bg-white p-4">
+<div *ngIf="paymentStatus == 'Failed'" class="flex flex-col items-center justify-center min-h-screen bg-white p-4">
   <ng-lottie
     width="100%"
     height="200px" 

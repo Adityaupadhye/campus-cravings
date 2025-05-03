@@ -61,12 +61,12 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",  # Add this line
 
 ]
@@ -200,3 +200,4 @@ AUTH_USER_MODEL = "app.User"
 # CASHFREE PAYMENT GATEWAY
 CF_APP_ID = os.getenv('CF_APP_ID', '')
 CF_SECRET_KEY = os.getenv('CF_SECRET_KEY', '')
+CF_RETURN_URL = os.getenv('CF_RETURN_URL', '')

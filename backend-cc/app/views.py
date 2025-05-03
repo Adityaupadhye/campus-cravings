@@ -20,6 +20,8 @@ from cashfree_pg.models import CreateOrderRequest, CustomerDetails, OrderMeta
 import urllib3
 from canteenapp import settings
 
+
+
 # Disable SSL warnings for sandbox (remove in production)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -570,10 +572,50 @@ class PaymentViewSet(viewsets.ModelViewSet):
     # Sandbox credentials
     x_api_version = "2023-08-01"
 
+    def calculate_total_price(self, current_user):
+        total_price = 0
+        user_cart_items = current_user.cart_items.select_related('menu_item').all()
+
+        for item in user_cart_items:
+            total_price += item.total_price
+
+
+        return total_price
     
-    @action(detail= False, methods=['post'],permission_classes=[IsAuthenticated],authentication_classes=[CookieJWTAuthentication])
+
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated], authentication_classes=[CookieJWTAuthentication], url_path='check-status')
+    def check_status(self, request):
+        order_id = request.query_params.get('order_id')
+        if not order_id:
+            return Response({'error': 'Missing order_id'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            current_order = ActiveOrder.objects.get(pk=int(order_id))
+        except ActiveOrder.DoesNotExist as dne:
+            print(dne)
+            return Response({'error': 'Incorrect order_id'}, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError as ve:
+            print(ve)
+            return Response({'error': 'Incorrect order_id'}, status=status.HTTP_400_BAD_REQUEST)
+
+        payment_qs = Payment.objects.filter(order=current_order).order_by('-created_at')
+
+        if not payment_qs.exists():
+            return Response({'error': 'Payment not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        latest_payment = payment_qs.first()
+
+        return Response({
+            'order_id': order_id,
+            'status': latest_payment.status,
+            'transaction_id': latest_payment.transaction_id,
+            'updated_at': latest_payment.updated_at,
+        })
+
+    
+    @action(detail= False, methods=['post'], permission_classes=[IsAuthenticated], authentication_classes=[CookieJWTAuthentication])
     def createorder(self,request):
         current_user = request.user
+
 
         try:
             total_price = int(request.data.get('total', 0))
@@ -583,6 +625,11 @@ class PaymentViewSet(viewsets.ModelViewSet):
         except (TypeError, ValueError) as e:
             return Response(
                 {"error": "Invalid total price", "detail": str(e)},status=status.HTTP_400_BAD_REQUEST)
+        
+        # calculate total price from user's cart
+        total_price = self.calculate_total_price(current_user)
+        print('total price: ', total_price)
+
         
 
         try: 
@@ -623,13 +670,16 @@ class PaymentViewSet(viewsets.ModelViewSet):
 
                 print('order items: ', order_items_created)
 
+
+
                 customerDetails = CustomerDetails(
-                    customer_id= current_user.name,
-                    customer_phone= User.objects.get(id=current_user.id).phone_number
+                    customer_id='USER_'+str(current_user.id),
+                    customer_name=(str(current_user.first_name)+' '+str(current_user.last_name)),
+                    customer_phone=User.objects.get(id=current_user.id).phone_number
                 )
             
                 orderMeta = OrderMeta(
-                    return_url=f"http://localhost:4200/payment/"
+                    return_url=settings.CF_RETURN_URL+str(order.id)
                 )
                 
                 createOrderRequest = CreateOrderRequest(
@@ -745,6 +795,8 @@ class PaymentViewSet(viewsets.ModelViewSet):
                 payment_status_internal = 'Failed'
             else:
                 payment_status_internal = 'Pending'
+
+            print('internal status: ', payment_status_internal)
 
             # Step 3: Find or create payment record for this order
             with transaction.atomic():
