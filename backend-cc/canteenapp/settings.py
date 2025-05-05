@@ -37,7 +37,7 @@ SECRET_KEY = 'django-insecure-%6y5w)4k1lj7f+)+dsqh&5=^e)t%7#24*3ar$wj(^^l8c@^=)s
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.1.103', '127.0.0.1','localhost',"10.130.150.228", '.ngrok-free.app']
+ALLOWED_HOSTS = ['192.168.1.103', '127.0.0.1','localhost',"10.130.150.228", '.ngrok-free.app', '*']
 
 
 # Application definition
@@ -102,11 +102,14 @@ DATABASES = {
     # },
     'default': {
         'ENGINE': 'django.db.backends.mysql',
+        'OPTIONS': {
+            'connect_timeout': 30,  # Increase timeout
+        },
         'NAME': os.getenv('DB_NAME'),
         'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),  # Or the IP address of your MySQL server
-        'PORT': os.getenv('DB_PORT'),       # Default MySQL port
+        'HOST': os.getenv('DB_HOST', 'db'),  # Or the IP address of your MySQL server
+        'PORT': os.getenv('DB_PORT', 3306),       # Default MySQL port
     }
 }
 

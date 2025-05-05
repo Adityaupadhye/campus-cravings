@@ -1,0 +1,67 @@
+services:
+
+  db:
+    image: mysql:8.0
+    container_name: campus-cravings-dev-mysql
+    restart: unless-stopped
+    env_file:
+      - path: ./backend-cc/.env
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "3306:3306"
+    networks:
+      - app_network
+    volumes:
+      - ./db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+      
+  backend:
+    build: ./backend-cc
+    # command: >
+    #   sh -c "
+    #     python manage.py migrate &&
+    #     python manage.py loaddata dummy-users.json &&
+    #     python manage.py runserver 0.0.0.0:8000
+    #   "
+    # command: python manage.py runserver localhost:8000
+    volumes:
+      - ./backend-cc:/app
+    env_file:
+      - path: ./backend-cc/.env
+    ports:
+      - "8000:8000"
+    networks:
+      - app_network
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: 
+      context: ./frontend-cc
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./frontend-cc:/app
+      - /app/node_modules
+    ports:
+      - "4200:4200"
+    networks:
+      - app_network
+    depends_on:
+      - backend
+
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  db_data:

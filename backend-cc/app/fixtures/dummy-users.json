@@ -1,0 +1,51 @@
+[
+    {
+      "model": "app.user",
+      "pk": 1,
+      "fields": {
+        "phone_number": "9990000001",
+        "username": "9990000001",
+        "first_name": "Alice",
+        "last_name": "User",
+        "password": "pbkdf2_sha256$1000000$GcBTRA00RYgMj4ht4LNOOV$/hbeONC8jq4CdagCho7TLj0sqPEEQP5/wEOks6plB80=",  
+        "role": "user",
+        "hostel": 1,
+        "is_active": true,
+        "is_staff": false,
+        "is_superuser": false
+      }
+    },
+    {
+      "model": "app.user",
+      "pk": 2,
+      "fields": {
+        "phone_number": "9990000002",
+        "username": "9990000002",
+        "first_name": "Bob",
+        "last_name": "Manager",
+        "password": "pbkdf2_sha256$1000000$GcBTRA00RYgMj4ht4LNOOV$/hbeONC8jq4CdagCho7TLj0sqPEEQP5/wEOks6plB80=",
+        "role": "canteen_manager",
+        "hostel": 2,
+        "is_active": true,
+        "is_staff": true,
+        "is_superuser": false
+      }
+    },
+    {
+      "model": "app.user",
+      "pk": 3,
+      "fields": {
+        "phone_number": "9990000003",
+        "username": "9990000003",
+        "first_name": "Charlie",
+        "last_name": "Admin",
+        "password": "pbkdf2_sha256$1000000$GcBTRA00RYgMj4ht4LNOOV$/hbeONC8jq4CdagCho7TLj0sqPEEQP5/wEOks6plB80=",
+        "role": "super_admin",
+        "hostel": 3,
+        "is_active": true,
+        "is_staff": true,
+        "is_superuser": true
+      }
+    }
+  ]
+  

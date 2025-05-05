@@ -10,12 +10,6 @@ class Store(models.Model):
         return "Open" if self.is_open else "Closed"
 
 class User(AbstractUser):
-
-    email = None
-    first_name = None
-    last_name = None 
-    username = None
-
     ROLE_CHOICES = [
         ('user', 'User'),
         ('canteen_manager', 'Canteen Manager'),
@@ -23,25 +17,37 @@ class User(AbstractUser):
     ]
 
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='user')
-    name= models.CharField(max_length=20,default="user",blank=False,null=False)
-    hostel=models.IntegerField(default=1)
-    phone_number= models.CharField(max_length=15,unique=True,default="123")
-    password = models.CharField(max_length=100,blank=False,null= False,unique= True)
-    
+    hostel = models.IntegerField(default=1)
+    phone_number = models.CharField(max_length=15, unique=True)
 
     USERNAME_FIELD = "phone_number"
-    REQUIRED_FIELDS = ["name","role"]  
+    REQUIRED_FIELDS = ["first_name", "last_name", "role"]
 
+    # Optional: Disable username field if you don't want it at all
+    # username = None
 
-    def is_admin(self):
-        return self.role=='canteen_manager'
-    
-    def is_user(self):
-        return self.role=='user'
-   
+    def save(self, *args, **kwargs):
+        # if self.first_name and self.last_name:
+        #     self.name = f"{self.first_name} {self.last_name}"
+        # else:
+        #     self.name = self.first_name or self.last_name or ""
+        
+        # Make phone_number the same as username
+        self.username = self.phone_number
+        super().save(*args, **kwargs)
+
+    @property
+    def name(self):
+        return f"{self.first_name} {self.last_name}".strip()
+
     def __str__(self):
         return self.name
-    
+
+    def is_admin(self):
+        return self.role == 'canteen_manager'
+
+    def is_user(self):
+        return self.role == 'user'
     
 
 class Category(models.Model):
